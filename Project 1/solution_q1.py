@@ -1,4 +1,5 @@
 #create node system that saves each state to track the path from the initial to the goal state
+import copy
 class Node:
     def __init__(self, state):
         def findBlank(matrix):
@@ -137,10 +138,13 @@ class puzzleSolver:
                 aux.append([])
                 for h in range(len(state.state[x])):
                     aux[x].append(state.state[x][h])
-            newMove = Node(aux.copy())
-            newMove.parent = state
             if self.isSolved(state,self.goalState):
-                return state
+                ans = []
+                ans.append(copy.deepcopy(visitedStates))
+                print("found")
+                return ans
+            #if self.isSolved(state,self.goalState):
+                #return state
             if 'D' in possibleMoves:
                 moveNumber = state.state[int(state.blankLocation[0])+1][int(state.blankLocation[1])]
                 state.move = str(moveNumber)+'U'
@@ -191,8 +195,4 @@ scramble = Node([[7,2,4],[5,'_',6],[8,3,1]])
 solve = puzzleSolver()
 result = solve.solver(scramble)
 moves = []
-while (result is not None):
-    moves.append(result.move)
-    result = result.parent
-print(moves)
-print(len(moves))
+print(len(result))
