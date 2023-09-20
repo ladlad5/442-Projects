@@ -124,7 +124,13 @@ class puzzleSolver:
         stack.append(node)
         visitedStates = []
         counter = 0
+        path =[]
+        traceMap = {}
         while True:
+            newMoveD = None
+            newMoveL = None
+            newMoveR = None
+            newMoveU = None
             state = stack.pop(-1)
             print(state.state)
             possibleMoves = self.possibleMoves[state.blankLocation]
@@ -139,10 +145,79 @@ class puzzleSolver:
                 for h in range(len(state.state[x])):
                     aux[x].append(state.state[x][h])
             if self.isSolved(state,self.goalState):
-                ans = []
-                ans.append(copy.deepcopy(visitedStates))
-                print("found")
-                return ans
+                return traceMap, state.parent
+            #if self.isSolved(state,self.goalState):
+                #return state
+            if 'D' in possibleMoves:
+                moveNumber = state.state[int(state.blankLocation[0])+1][int(state.blankLocation[1])]
+                state.move = str(moveNumber)+'U'
+                newMoveD = Node([x[:] for x in aux])
+                newMoveD.parent = state
+                newMoveD.state[int(state.blankLocation[0])][int(state.blankLocation[1])], newMoveD.state[int(state.blankLocation[0])+1][int(state.blankLocation[1])] = newMoveD.state[int(state.blankLocation[0])+1][int(state.blankLocation[1])], newMoveD.state[int(state.blankLocation[0])][int(state.blankLocation[1])]
+                newMoveD.blankLocation=newMoveD.findBlank(newMoveD.state)
+                stack.append(newMoveD)
+                #newMove.state[int(state.blankLocation[0])][int(state.blankLocation[1])], newMove.state[int(state.blankLocation[0])+1][int(state.blankLocation[1])] = newMove.state[int(state.blankLocation[0])+1][int(state.blankLocation[1])], newMove.state[int(state.blankLocation[0])][int(state.blankLocation[1])]
+                #newMove.blankLocation=newMove.findBlank(newMove.state)
+            if 'R' in possibleMoves:
+                moveNumber = state.state[int(state.blankLocation[0])][int(state.blankLocation[1])+1]
+                state.move = str(moveNumber)+'L'
+                newMoveR = Node([x[:] for x in aux])
+                newMoveR.parent = state
+                newMoveR.state[int(state.blankLocation[0])][int(state.blankLocation[1])], newMoveR.state[int(state.blankLocation[0])][int(state.blankLocation[1])+1] = newMoveR.state[int(state.blankLocation[0])][int(state.blankLocation[1])+1], newMoveR.state[int(state.blankLocation[0])][int(state.blankLocation[1])]
+                newMoveR.blankLocation=newMoveR.findBlank(newMoveR.state)
+                stack.append(newMoveR)
+                #newMove.state[int(state.blankLocation[0])][int(state.blankLocation[1])], newMove.state[int(state.blankLocation[0])][int(state.blankLocation[1])+1] = newMove.state[int(state.blankLocation[0])][int(state.blankLocation[1])+1], newMove.state[int(state.blankLocation[0])][int(state.blankLocation[1])]
+                #newMove.blankLocation=newMove.findBlank(newMove.state)
+            if 'L' in possibleMoves:
+                moveNumber = state.state[int(state.blankLocation[0])][int(state.blankLocation[1])-1]
+                state.move = str(moveNumber)+'R'
+                newMoveL = Node([x[:] for x in aux])
+                newMoveL.parent = state
+                newMoveL.state[int(state.blankLocation[0])][int(state.blankLocation[1])], newMoveL.state[int(state.blankLocation[0])][int(state.blankLocation[1])-1] = newMoveL.state[int(state.blankLocation[0])][int(state.blankLocation[1])-1], newMoveL.state[int(state.blankLocation[0])][int(state.blankLocation[1])]
+                newMoveL.blankLocation=newMoveL.findBlank(newMoveL.state)
+                stack.append(newMoveL)
+                #newMove.state[int(state.blankLocation[0])][int(state.blankLocation[1])], newMove.state[int(state.blankLocation[0])][int(state.blankLocation[1])-1] = newMove.state[int(state.blankLocation[0])][int(state.blankLocation[1])-1], newMove.state[int(state.blankLocation[0])][int(state.blankLocation[1])]
+                #newMove.blankLocation=newMove.findBlank(newMove.state)
+            if 'U' in possibleMoves:
+                moveNumber = state.state[int(state.blankLocation[0])-1][int(state.blankLocation[1])]
+                state.move = str(moveNumber)+'D'
+                newMoveU = Node([x[:] for x in aux])
+                newMoveU.parent = state
+                newMoveU.state[int(state.blankLocation[0])][int(state.blankLocation[1])], newMoveU.state[int(state.blankLocation[0])-1][int(state.blankLocation[1])] = newMoveU.state[int(state.blankLocation[0])-1][int(state.blankLocation[1])], newMoveU.state[int(state.blankLocation[0])][int(state.blankLocation[1])]
+                newMoveU.blankLocation=newMoveU.findBlank(newMoveU.state)
+                stack.append(newMoveU)
+                #newMove.state[int(state.blankLocation[0])][int(state.blankLocation[1])], newMove.state[int(state.blankLocation[0])-1][int(state.blankLocation[1])] = newMove.state[int(state.blankLocation[0])-1][int(state.blankLocation[1])], newMove.state[int(state.blankLocation[0])][int(state.blankLocation[1])]
+                #newMove.blankLocation=newMove.findBlank(newMove.state)
+            children = [newMoveD,newMoveR,newMoveL,newMoveU]
+            for child in children:
+                traceMap[child] = state #this line was added
+            counter += 1
+            print(counter)
+    
+    
+    def solverBFS(self, node):
+        visitedStates = []
+        stack = []
+        stack.append(node)
+        visitedStates = []
+        counter = 0
+        path =[]
+        while True:
+            state = stack.pop(0)
+            print(state.state)
+            possibleMoves = self.possibleMoves[state.blankLocation]
+            aux = []
+            if state.state in visitedStates:
+                continue
+            else:
+                visitedStates.append(state.state)
+                print("NEW STATE" + str(state.state))
+            for x in range(len(state.state)):
+                aux.append([])
+                for h in range(len(state.state[x])):
+                    aux[x].append(state.state[x][h])
+            if self.isSolved(state,self.goalState):
+                return path
             #if self.isSolved(state,self.goalState):
                 #return state
             if 'D' in possibleMoves:
@@ -195,4 +270,16 @@ scramble = Node([[7,2,4],[5,'_',6],[8,3,1]])
 solve = puzzleSolver()
 result = solve.solver(scramble)
 moves = []
-print(len(result))
+curr = result[1]
+result = result[0]
+'''while curr is not None:
+    moves.append(curr.move)
+    curr = curr.parent'''
+print(len(moves))
+while (curr != None):
+    moves.append(curr.move)
+    if curr.parent is not None:
+        curr = curr.parent
+    else:
+        curr = None
+print(moves)
