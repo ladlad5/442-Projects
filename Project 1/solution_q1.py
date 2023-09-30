@@ -1,5 +1,6 @@
 #create node system that saves each state to track the path from the initial to the goal state
 import copy
+import heapq
 class Node:
     def __init__(self, state):
         def findBlank(matrix):
@@ -196,6 +197,30 @@ class puzzleSolver:
         print(f"{numExpanded=}")
         return solution
     
+    '''def solverUCS(self, node):
+        frontier = [node]
+        reached = set()
+        reached.add(node.getState())
+        solution = None
+        numExpanded = 0
+        while frontier:
+            parent = frontier.pop(0)
+            numExpanded += 1
+            #print(f"{numExpanded=}")
+            #print(f"{parent.state=}")
+            #print(f"{reached=}")
+            for child in self.successors(parent):
+                state = child.getState()
+                #print(f"{state=}")
+                if self.isSolved(state):
+                    print(f"{numExpanded=}")
+                    return child
+                elif state not in reached:
+                    reached.add((state),)
+                    frontier.append(child)
+        print(f"{numExpanded=}")
+        return solution'''
+
     
     def solverBFS(self, node):
         frontier = [node]
@@ -220,18 +245,36 @@ class puzzleSolver:
                     frontier.append(child)
         print(f"{numExpanded=}")
         return solution
+    
+    def solverUCS(self, node):
+        tiebreaker = 0
+        frontier = [(len(self.getMoves(node)),tiebreaker,node)]
+        reached = {}
+        solution = None
+        while frontier and (solution is None or frontier[0][0] < len(self.getMoves(solution))):
+            cost, _, parent = heapq.heappop(frontier)
+            for child in self.successors(parent):
+                state = child.getState()
+                if state not in reached or cost + 1 < len(self.getMoves(reached[state])):
+                    reached[state] = child
+                    tiebreaker += 1
+                    heapq.heappush(frontier, (cost + 1, tiebreaker, child))
+                    if self.isSolved(state) and (solution is None or cost+1 < len(self.getMoves(solution))):
+                        solution = child
+        return solution
 
 
             
     def isSolved(self, current):
         return current == self.goalState
     
-scramble = Node([[1,2,5],[3,4,'_'],[6,7,8]])
+#scramble = Node([[1,2,5],[3,4,'_'],[6,7,8]])
+#scramble = Node([[1,'_',2],[3,4,5],[6,7,8]])
 #scramble = Node([[7,2,4],[5,'_',6],[8,3,1]])
-#scramble = Node([[1,4,2],[3,'_',5],[6,7,8]])
+scramble = Node([[1,4,2],[3,'_',5],[6,7,8]])
 solve = puzzleSolver()
 #result = solve.solverBFS(scramble)
-result = solve.solverBFS(scramble)
+result = solve.solverUCS(scramble)
 moves = solve.getMoves(result)
 print(moves)
 '''moves = []
