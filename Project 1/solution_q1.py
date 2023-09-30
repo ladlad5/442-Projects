@@ -140,17 +140,20 @@ class puzzleSolver:
             children = []
             for x in possibleMoves:
                 swapCoordinate = self.move[x]
-                print(f"{swapCoordinate=}")
+                #print(f"{swapCoordinate=}")
                 '''moveNumber = parent.state[int(parent.blankLocation[0])+1][int(parent.blankLocation[1])]
                 parent.move = str(moveNumber)+ self.opposites[x]'''
                 newMove = Node([x[:] for x in parent.state])
                 newMove.parent = parent
                 parent.blankLocation = parent.findBlank(parent.state)
-                print(f"{parent.blankLocation=}")
+                #print(f"{parent.blankLocation=}")
                 blankRow = int(parent.blankLocation[0])
-                print(f"{blankRow=}")
+                #print(f"{blankRow=}")
                 blankCol = int(parent.blankLocation[1])
-                print(f"{blankCol=}")
+                #print(f"{blankCol=}")
+                getSwapNum = parent.state[blankRow+swapCoordinate[0]][blankCol+swapCoordinate[1]]
+                currentMove = str(getSwapNum)+str(self.opposites[x])
+                newMove.move = currentMove
                 newMove.state[blankRow][blankCol] = newMove.state[blankRow+swapCoordinate[0]][blankCol+swapCoordinate[1]]
                 newMove.state[blankRow+swapCoordinate[0]][blankCol+swapCoordinate[1]] = '_'
                 '''(newMove.state[int(parent.blankLocation[0])+swapCoordinate[0]][int(parent.blankLocation[1])], 
@@ -161,58 +164,61 @@ class puzzleSolver:
                 newMove.level = parent.level+1
                 children.append(newMove)
             return children
+    
+    def getMoves(self, node):
+        moves = []
+        while node:
+            moves.append(node.move)
+            node = node.parent
+        return list(reversed(moves[:-1]))
 
-    def solver(self, node):
-        visitedStates = []
-        stack = []
-        stack.append(node)
-        visitedStates = []
-        counter = 0
-        path =[]
-        traceMap = {}
-        while True:
-            state = stack.pop(-1)
-            print(state.state)
-            possibleMoves = self.possibleMoves[state.blankLocation]
-            aux = []
-            if state.state in visitedStates:
-                continue
-            else:
-                visitedStates.append(state.state)
-                print("NEW STATE" + str(state.state))
-            for x in range(len(state.state)):
-                aux.append([])
-                for h in range(len(state.state[x])):
-                    aux[x].append(state.state[x][h])
-            if self.isSolved(state,self.goalState):
-                return traceMap, state.parent
-            #if self.isSolved(state,self.goalState):
-                #return state
-            for child in children:
-                traceMap[child] = state #this line was added
-            counter += 1
-            print(counter)
+    def solverDFS(self, node):
+        frontier = [node]
+        reached = set()
+        reached.add(node.getState())
+        solution = None
+        numExpanded = 0
+        while frontier:
+            parent = frontier.pop(-1)
+            numExpanded += 1
+            #print(f"{numExpanded=}")
+            #print(f"{parent.state=}")
+            #print(f"{reached=}")
+            for child in self.successors(parent):
+                state = child.getState()
+                #print(f"{state=}")
+                if self.isSolved(state):
+                    print(f"{numExpanded=}")
+                    return child
+                elif state not in reached:
+                    reached.add((state),)
+                    frontier.append(child)
+        print(f"{numExpanded=}")
+        return solution
     
     
     def solverBFS(self, node):
         frontier = [node]
         reached = set()
+        reached.add(node.getState())
         solution = None
         numExpanded = 0
         while frontier:
             parent = frontier.pop(0)
             numExpanded += 1
-            print(f"{parent.state=}")
-            print(f"{reached=}")
+            #print(f"{numExpanded=}")
+            #print(f"{parent.state=}")
+            #print(f"{reached=}")
             for child in self.successors(parent):
                 state = child.getState()
-                print(f"{state=}")
+                #print(f"{state=}")
                 if self.isSolved(state):
+                    print(f"{numExpanded=}")
                     return child
                 elif state not in reached:
                     reached.add((state),)
                     frontier.append(child)
-            print(f"{numExpanded=}")
+        print(f"{numExpanded=}")
         return solution
 
 
@@ -220,10 +226,14 @@ class puzzleSolver:
     def isSolved(self, current):
         return current == self.goalState
     
-scramble = Node([[7,2,4],[5,'_',6],[8,3,1]])
+scramble = Node([[1,2,5],[3,4,'_'],[6,7,8]])
+#scramble = Node([[7,2,4],[5,'_',6],[8,3,1]])
+#scramble = Node([[1,4,2],[3,'_',5],[6,7,8]])
 solve = puzzleSolver()
+#result = solve.solverBFS(scramble)
 result = solve.solverBFS(scramble)
-print(result)
+moves = solve.getMoves(result)
+print(moves)
 '''moves = []
 levels = []
 curr = result[1]
