@@ -1,6 +1,7 @@
 #create node system that saves each state to track the path from the initial to the goal state
 import copy
 import heapq
+import math
 class Node:
     def __init__(self, state):
         def findBlank(matrix):
@@ -251,7 +252,9 @@ class puzzleSolver:
         frontier = [(len(self.getMoves(node)),tiebreaker,node)]
         reached = {}
         solution = None
+        numexpanded = 0
         while frontier and (solution is None or frontier[0][0] < len(self.getMoves(solution))):
+            numexpanded += 1
             cost, _, parent = heapq.heappop(frontier)
             for child in self.successors(parent):
                 state = child.getState()
@@ -261,20 +264,74 @@ class puzzleSolver:
                     heapq.heappush(frontier, (cost + 1, tiebreaker, child))
                     if self.isSolved(state) and (solution is None or cost+1 < len(self.getMoves(solution))):
                         solution = child
+        print(f"UCS {numexpanded=}")
         return solution
 
 
-            
+    def sumHeuristic(self, state, heuristic):
+        goalCoords = {
+            '_': (0,0),
+            1: (0,1),
+            2: (0,2),
+            3: (1,0),
+            4: (1,1),
+            5: (1,2),
+            6: (2,0),
+            7: (2,1),
+            8: (2,2),
+        }
+        total = 0
+        for rowId, row in enumerate(state):
+            for colId, num in enumerate(row):
+                total += heuristic(goalCoords[num], rowId, colId)
+        return total
+
+    def manhattan(self, state):
+        return self.sumHeuristic(state, self.manhattanHelper)
+    
+    def manhattanHelper(self, goal, row, col):
+        return sum([abs(goal[0]-row), abs(goal[1]-col)])
+    
+    def straightLine(self, state):
+        return self.sumHeuristic(state, self.straightLineHelper)
+    
+    def straightLineHelper(self, goal, row, col):
+        return math.sqrt(sum([abs(goal[0]-row)**2, abs(goal[1]-col)**2]))
+    
+    def solverAStar(self, node, heuristic=lambda state: 0):
+        tiebreaker = 0
+        frontier = [(len(self.getMoves(node))+heuristic(node.getState()),tiebreaker,node)]
+        reached = {}
+        solution = None
+        numExpanded = 0
+        while frontier and (solution is None or frontier[0][0] < len(self.getMoves(solution))):
+            numExpanded += 1
+            cost, _, parent = heapq.heappop(frontier)
+            for child in self.successors(parent):
+                state = child.getState()
+                if state not in reached or cost + 1 < len(self.getMoves(reached[state])):
+                    reached[state] = child
+                    tiebreaker += 1
+                    heapq.heappush(frontier, (cost + 1 + heuristic(state), tiebreaker, child))
+                    if self.isSolved(state) and (solution is None or cost+1 < len(self.getMoves(solution))):
+                        solution = child
+        print(f"A* {numExpanded=}")
+        return solution   
+
+
     def isSolved(self, current):
         return current == self.goalState
     
 #scramble = Node([[1,2,5],[3,4,'_'],[6,7,8]])
 #scramble = Node([[1,'_',2],[3,4,5],[6,7,8]])
-#scramble = Node([[7,2,4],[5,'_',6],[8,3,1]])
-scramble = Node([[1,4,2],[3,'_',5],[6,7,8]])
+scramble = Node([[7,2,4],[5,'_',6],[8,3,1]])
+#scramble = Node([[1,4,2],[3,'_',5],[6,7,8]])
 solve = puzzleSolver()
 #result = solve.solverBFS(scramble)
-result = solve.solverUCS(scramble)
+'''result = solve.solverUCS(scramble)
+moves = solve.getMoves(result)
+print(moves)'''
+result = solve.solverAStar(scramble, solve.straightLine)
 moves = solve.getMoves(result)
 print(moves)
 '''moves = []
