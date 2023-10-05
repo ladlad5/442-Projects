@@ -7,7 +7,7 @@ class Node:
         def findBlank(matrix):
             for x in range(len(matrix)):
                 for h in range(len(matrix[x])):
-                    if matrix[x][h] == "_":
+                    if matrix[x][h] == '_':
                         return str(x)+str(h)
         self.state = state
         self.parent = None
@@ -116,7 +116,7 @@ class puzzleSolver:
     possibleMoves = {
         "00": ['D','R'],
         "01": ['D','R','L'],
-        "02": ['D','L'],
+        "02": ['L','D'],
         "10": ['D','R','U'],
         "11": ['D','R','L','U'],
         "12": ['D','L','U'],
@@ -195,7 +195,7 @@ class puzzleSolver:
                 elif state not in reached:
                     reached.add((state),)
                     frontier.append(child)
-        print(f"{numExpanded=}")
+        print(f"DFS {numExpanded=}")
         return solution
     
     '''def solverUCS(self, node):
@@ -239,12 +239,12 @@ class puzzleSolver:
                 state = child.getState()
                 #print(f"{state=}")
                 if self.isSolved(state):
-                    print(f"{numExpanded=}")
+                    print(f"BFS {numExpanded=}")
                     return child
                 elif state not in reached:
                     reached.add((state),)
                     frontier.append(child)
-        print(f"{numExpanded=}")
+        print(f"BFS {numExpanded=}")
         return solution
     
     def solverUCS(self, node):
@@ -323,40 +323,35 @@ class puzzleSolver:
         return current == self.goalState
     
 #scramble = Node([[1,2,5],[3,4,'_'],[6,7,8]])
+#scramble = Node([[8,'_',6],[5,4,7],[2,3,1]])
 #scramble = Node([[1,'_',2],[3,4,5],[6,7,8]])
-scramble = Node([[7,2,4],[5,'_',6],[8,3,1]])
+#scramble = Node([[7,2,4],[5,'_',6],[8,3,1]])
 #scramble = Node([[1,4,2],[3,'_',5],[6,7,8]])
 solve = puzzleSolver()
 #result = solve.solverBFS(scramble)
 '''result = solve.solverUCS(scramble)
 moves = solve.getMoves(result)
 print(moves)'''
+with open('input.txt') as f:
+    puzzle = f.readlines()
+puzzle = str(puzzle[0]).split(',')
+for x in range(len(puzzle)):
+    if puzzle[x].isnumeric():
+        puzzle[x] = int(puzzle[x])
+scramble = Node([puzzle[0:3], puzzle[3:6], puzzle[6:]])
+result = solve.solverDFS(scramble)
+moves = solve.getMoves(result)
+print(f"The solution of q1.1 is: \n{moves}")
+result = solve.solverBFS(scramble)
+moves = solve.getMoves(result)
+print(f"The solution of q1.2 is: \n{moves}")
+result = solve.solverUCS(scramble)
+moves = solve.getMoves(result)
+print(f"The solution of q1.3 is: \n{moves}")
+result = solve.solverAStar(scramble, solve.manhattan)
+moves = solve.getMoves(result)
+print(f"The solution of q1.4 is: \n{moves}")
 result = solve.solverAStar(scramble, solve.straightLine)
 moves = solve.getMoves(result)
-print(moves)
-'''moves = []
-levels = []
-curr = result[1]
-result = result[0]
-while curr is not None:
-    moves.append(curr.move)
-    curr = curr.parent
-print(len(moves))
-while (curr != None):
-    if curr.level not in levels:
-        moves.append(curr.move)
-        levels.append(curr.level)
-    if curr.parent is not None:
-        curr = curr.parent
-    else:
-        curr = None
-opposite = {
-    'U' : 'D',
-    'D': 'U',
-    'L': 'R',
-    'R':'L'
-    }
-new = []
-for x in range(len(moves)):
-    new.append
-print(moves)'''
+print(f"The solution of q1.5 is: \n{moves}")
+
