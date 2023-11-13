@@ -11,7 +11,7 @@ prevAction = None
 Q = defaultdict(int)
 N = defaultdict(int)
 sumReward = 0
-roundNum = 200
+roundNum = 500
 #def qHelper()
 for x in range(roundNum):
     N[(prevObservation, prevAction)] += 1
