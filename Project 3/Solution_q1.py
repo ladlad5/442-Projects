@@ -2,8 +2,8 @@ import gymnasium as gym
 from collections import defaultdict
 env = gym.make("Blackjack-v1", render_mode="human") # Initializing environments
 observation, info = env.reset()
-learningRate = 0.9
-gamma = 0.8
+learningRate = 0.95
+gamma = 0.85
 action = 0
 reward = 0
 prevObservation = None
@@ -11,9 +11,16 @@ prevAction = None
 Q = defaultdict(int)
 N = defaultdict(int)
 sumReward = 0
-roundNum = 500
+roundNum = 100
+interval = roundNum / 10
+check = 0
 #def qHelper()
 for x in range(roundNum):
+    current = x
+    if current - interval >= check:
+        check += interval
+        learningRate -= 0.03
+        print(f'{learningRate=}')
     N[(prevObservation, prevAction)] += 1
     Q[(prevObservation, prevAction)] += (learningRate*(N[(prevObservation, prevAction)]) * 
                                          (reward + (gamma * max(Q[(observation, 1)] - Q[(prevObservation, prevAction)], 
