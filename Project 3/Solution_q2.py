@@ -55,30 +55,13 @@ class MDP:
 
 
 
-'''T = defaultdict(int)
-C = defaultdict(int)
-N = defaultdict(lambda: defaultdict(int))
-R = defaultdict(int)'''
-'''def calcT(prevObservation, action, observation):
-    return N[(prevObservation, action)][observation]/C[(prevObservation, action)]'''
+
 mdp = MDP(0.9)
 for _ in range(1000):
     randnum = random.randint(1,20)
     prevObservation = observation
     action = env.action_space.sample() # agent policy that uses the observation and info
-    '''if randnum <= 5:
-        Utility, possibleActions = mdp.spaces()
-        prevUtility = Utility.copy()
-        for state in Utility:
-            maxList = []
-            for action in possibleActions[state]:
-                maxList.append(mdp.QValue(state, action, prevUtility))
-            Utility[state] = max(maxList)
-        action = mdp.bestAction(Utility, observation)'''
     observation, reward, terminated, truncated, info = env.step(action)
-    '''C[(prevObservation, action)] += 1
-    N[(prevObservation, action)][observation] += 1
-    R[(prevObservation,action,observation)] = reward'''
     mdp.observe(prevObservation, action, observation, reward)
     if terminated or truncated:
         observation, info = env.reset()
@@ -91,9 +74,7 @@ Utility = defaultdict(int)
 prevUtility = {}
 possibleActions = defaultdict(list)
 delta = 0
-'''for state, action in self.N:
-    Utility[state] = 0
-    possibleActions[state].append(action)'''
+
 Utility, possibleActions = mdp.spaces()
 while delta >= epsilon*(1-mdp.gamma)/mdp.gamma:
     prevUtility = Utility.copy()
@@ -106,10 +87,8 @@ while delta >= epsilon*(1-mdp.gamma)/mdp.gamma:
         if abs(prevUtility[state] - Utility[state]) > delta:
             delta = abs(prevUtility[state] - Utility[state])
 
-input("acting is about to start")
-print("acting on policy")
 avgReward = 0
-cycleCount = 10
+cycleCount = 1
 for _ in range(cycleCount):
     observation, info = env.reset()
     while not terminated and not truncated:
