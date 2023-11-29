@@ -3,7 +3,7 @@ from collections import defaultdict
 env = gym.make("Blackjack-v1", render_mode="human") # Initializing environments
 observation, info = env.reset()
 learningRate = 0.95
-gamma = 0.85
+gamma = 0.80
 action = 0
 reward = 0
 prevObservation = None
@@ -19,7 +19,7 @@ for x in range(roundNum):
     current = x
     if current - interval >= check:
         check += interval
-        learningRate -= 0.03
+        #learningRate -= 0.03 #decided to get rid of a variable learning rate
         print(f'{learningRate=}')
     N[(prevObservation, prevAction)] += 1
     Q[(prevObservation, prevAction)] += (learningRate*(N[(prevObservation, prevAction)]) * 
