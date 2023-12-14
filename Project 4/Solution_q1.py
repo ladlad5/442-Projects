@@ -132,13 +132,7 @@ PWExpected = CPT("john*mary",{
 #print(test.table)
 #print(sumOut("alarm", test).table)
 
-'''def varElim(X, e, bn):
-    factors = []
-    for var in bn:
-        factors = makeFactor(bn[var], e, factors)
-        if (not bn[var].name == X and not bn[var].name in e):
-            factors = sumOut(bn[var], factors)
-    return normalize(pointWiseProd(None, factors))'''
+
 
 def varElim(X, e, bn):
     factors = []
@@ -192,5 +186,4 @@ evidence = {
     "john": True
 }
 test = varElim(query, evidence, bayesNet)
-#print(varElim(query, evidence, bayesNet).table)
 print(f'Probability of a burglary given john called: {test[0].table}')
